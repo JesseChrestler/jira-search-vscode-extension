@@ -25,7 +25,7 @@ Can only point to one JIRA site so if you use multiple JIRA issues this is curre
 ## Release Notes
 
 
-### 1.0.0
+### 0.0.1
 
 Initial release of Jira Search Extension
 
