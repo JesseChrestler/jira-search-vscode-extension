@@ -7,31 +7,54 @@ Possibly in the future I will add other search/queries you can perform.
 
 This is currently not published in the visual studio code market.
 Simply run the following command:
-> code --install-extension jira-search-0.0.1.vsix
+> code --install-extension jira-search-0.1.0.vsix
 
+## Usage
+
+Type "Jira Search My Issues"
 
 ## Features
 
-The only command is "Jira Search My Issues"
+* View issues assigned to you
+* View comments on issues
+* Add comments to issues
+* Transition issues from one status to another
 
 > Tip: The list that shows when you execute the command can be filtered as you type.
 
 ## Extension Settings
 
 This extension contributes the following settings:
-
-* `jiraSearch.url`: the base url for your jira site (ex. "http://mysite.jira.com")
-* `jiraSearch.username`: username for your jira account (typically not the email address)
-* `jiraSearch.password`: password for your jira account
+> Configuration for required fields
+* `"jiraSearch.url"` : `""` the base url for your jira site (ex. "http://mysite.jira.com")
+* `"jiraSearch.username"` : `""`  username for your jira account (typically not the email address)
+* `"jiraSearch.password"` : `""` password for your jira account
+> Configuration (optional) for how JIRA issues will be displayed you can customize this based on your custom fields in your JIRA implementation
+* `"jiraSearch.labelFormat"` : `"{fields.status.name} - [{fields.issuetype.name}][{fields.priority.name}] {key}"`
+* `"jiraSearch.descriptionFormat"` : `"{fields.summary}"`
+* `"jiraSearch.detailFormat"` : `"{fields.description}"`
+> Configuration (optional) for how JIRA issues will be copied to your clipboard
+* `"jiraSearch.clipboardFormat"`: `"{key} - {fields.summary} - {fields.description}"`
+> Configuration (optional) jql (Jira Query Language) query format (only token available is username currently). Currently will give all issues assigned to you, where status is not done, and it will be ordered by created date.
+* `"jiraSearch.jql"` : `"assignee={username} and status!=Done order by created"`
+> Configuration (optional) how often to update issues (in minutes)
+* `"updateInterval"` : `5`
 
 ## Known Issues
 
-Can only point to one JIRA site so if you use multiple JIRA issues this is currently not supported.
+Issues will not get pulled everytime you run the command, they will only get pulled when you run the command the first time and then they will be pulled every X interval (default 5 minutes) which is customizable.
 
 ## Release Notes
 
 
+### 0.1.0
+
+* Refactored code to be more modular.
+* Added ability to view comments on issue.
+* Added ability to add comments to issues.
+* Added ability to transition issues from one status to another.
+* Added better customization support for queries and how things will be displayed.
+
 ### 0.0.1
 
 Initial release of Jira Search Extension
-

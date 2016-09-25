@@ -10,8 +10,8 @@
   },
   "displayName": "jira-search",
   "description": "Allows you to view your jira issues in visual studio code.",
-  "version": "0.0.1",
-  "publisher": "JesseChrestler",
+  "version": "0.1.0",
+  "publisher": "xceleration",
   "engines": {
     "vscode": "^1.5.0"
   },
