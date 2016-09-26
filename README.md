@@ -25,20 +25,34 @@ Type "Jira Search My Issues"
 ## Extension Settings
 
 This extension contributes the following settings:
-> Configuration for required fields
-* `"jiraSearch.url"` : `""` the base url for your jira site (ex. "http://mysite.jira.com")
-* `"jiraSearch.username"` : `""`  username for your jira account (typically not the email address)
-* `"jiraSearch.password"` : `""` password for your jira account
-> Configuration (optional) for how JIRA issues will be displayed you can customize this based on your custom fields in your JIRA implementation
-* `"jiraSearch.labelFormat"` : `"{fields.status.name} - [{fields.issuetype.name}][{fields.priority.name}] {key}"`
-* `"jiraSearch.descriptionFormat"` : `"{fields.summary}"`
-* `"jiraSearch.detailFormat"` : `"{fields.description}"`
-> Configuration (optional) for how JIRA issues will be copied to your clipboard
-* `"jiraSearch.clipboardFormat"`: `"{key} - {fields.summary} - {fields.description}"`
-> Configuration (optional) jql (Jira Query Language) query format (only token available is username currently). Currently will give all issues assigned to you, where status is not done, and it will be ordered by created date.
-* `"jiraSearch.jql"` : `"assignee={username} and status!=Done order by created"`
-> Configuration (optional) how often to update issues (in minutes)
-* `"updateInterval"` : `5`
+### Configuration Required Fields
+> `//the base url for your jira site (ex. "http://mysite.jira.com")` 
+> `"jiraSearch.url"` : `"http://mysite.jira.com"`,
+> `//username for your jira account (typically not the email address)`
+> `"jiraSearch.username"` : `"username"`,
+> `//password for your jira account` 
+> `"jiraSearch.password"` : `"password"`
+
+### Configuration (optional) 
+
+
+> #### How JIRA issues will be displayed you can customize this based on your custom fields in your JIRA implementation
+>
+> `"jiraSearch.labelFormat"` : `"{fields.status.name} - [{fields.issuetype.name}][{fields.priority.name}] {key}",`
+> `"jiraSearch.descriptionFormat"` : `"{fields.summary}",`
+> `"jiraSearch.detailFormat"` : `"{fields.description}"`
+>
+> #### How JIRA issues will be copied to your clipboard
+>
+> `"jiraSearch.clipboardFormat"`: `"{key} - {fields.summary} - {fields.description}"`
+> 
+> #### JQL (Jira Query Language) query format (only token available is username currently). Currently will give all issues assigned to you, where status is not done, and it will be ordered by created date.
+> 
+> `"jiraSearch.jql"` : `"assignee={username} and status!=Done order by created"`
+>
+> #### How often to update issues (in minutes)
+>
+> `"jiraSearch.updateInterval"` : `5`
 
 ## Known Issues
 
