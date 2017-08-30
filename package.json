@@ -15,12 +15,8 @@
   "engines": {
     "vscode": "^1.5.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:extension.jiraSearch"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["onCommand:extension.jiraSearch"],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [
@@ -28,7 +24,28 @@
         "command": "extension.jiraSearch",
         "title": "Jira Search My Issues"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "jira-search configuration",
+      "properties": {
+        "jiraSearch.url": {
+          "type": "string",
+          "default": "https://subdomain.atlassian.net",
+          "description": "Base URL for your jira site"
+        },
+        "jiraSearch.username": {
+          "type": "string",
+          "default": "",
+          "description": "Username for your jira account (typically not the email address)"
+        },
+        "jiraSearch.password": {
+          "type": "string",
+          "default": "",
+          "description": "Password for your jira account"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
