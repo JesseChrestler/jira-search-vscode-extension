@@ -15,18 +15,18 @@
   "engines": {
     "vscode": "^1.5.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:extension.jiraSearch"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["onCommand:extension.jiraSearch"],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [
       {
         "command": "extension.jiraSearch",
         "title": "Jira Search My Issues"
+      },
+      {
+        "command": "extension.jiraSearchByIssueKey",
+        "title": "Jira View issue"
       }
     ]
   },
