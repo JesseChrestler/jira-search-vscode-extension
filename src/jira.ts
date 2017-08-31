@@ -239,18 +239,19 @@ export function showIssueKeySearch() {
   };
   window.showInputBox(inputBoxOptions).then((issueKey: string) => {
     window.setStatusBarMessage(`Fetching issue ${issueKey}`, 1500);
-    jiraApi.getIssue(issueKey).then((response: any) => {
-      try {
+    jiraApi
+      .getIssue(issueKey)
+      .then((response: any) => {
         if (response === null) {
-          throw new Error('No response from JIRA');
-        } else if (response.errorMessages) {
-          throw new Error(response.errorMessages[0]);
+          throw Error('No response from JIRA');
+        } else if (response.errorMessages && response.errorMessages.length > 0) {
+          throw Error(response.errorMessages[0]);
         }
         jiraIssueMap[response.key] = response;
         showSelectionOptions({ label: response.key });
-      } catch (err) {
-        window.setStatusBarMessage(err, 2500);
-      }
-    });
+      })
+      .catch(err => {
+        window.showErrorMessage(err.message);
+      });
   });
 }
