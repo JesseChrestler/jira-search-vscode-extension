@@ -129,9 +129,15 @@ function showComments(issue): void {
     let comments = response['comments'];
     let label = parseTokens(issue, jiraConfig.labelFormat);
     if (comments.length == 0) {
-      window.showInformationMessage(`No comments found for issue ${label}`);
+      window.showInformationMessage(`No comments found for issue ${label}`, 'Go back').then((selection: string) => {
+        if (selection !== undefined) {
+          showSelectionOptions({ label: issue.key });
+        }
+      });
     } else {
-      window.showQuickPick(comments.map(commentToQuickPick));
+      window.showQuickPick(comments.map(commentToQuickPick)).then(row => {
+        showSelectionOptions({ label: issue.key });
+      });
     }
   });
 }
@@ -176,7 +182,11 @@ function showTransitionOptions(issue): void {
       });
   });
 }
-function showSelectionOptions(quickPickItem): void {
+/**
+ * 
+ * @param {*} quickPickItem Contains "label" which should be the issue key
+ */
+function showSelectionOptions(quickPickItem: any): void {
   let selectedIssue = jiraIssueMap[quickPickItem.label];
   let cancelButton: MessageItem = {
     isCloseAffordance: true,
