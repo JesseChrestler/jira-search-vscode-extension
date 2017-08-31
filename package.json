@@ -8,19 +8,18 @@
     "type": "git",
     "url": "https://github.com/JesseChrestler/jira-search-vscode-extension"
   },
+  "bugs": {
+    "url": "https://github.com/JesseChrestler/jira-search-vscode-extension/issues"
+  },
   "displayName": "jira-search",
   "description": "Allows you to view your jira issues in visual studio code.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "xceleration",
   "engines": {
     "vscode": "^1.5.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:extension.jiraSearch"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["onCommand:extension.jiraSearch"],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [
@@ -28,7 +27,58 @@
         "command": "extension.jiraSearch",
         "title": "Jira Search My Issues"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "jira-search configuration",
+      "properties": {
+        "jiraSearch.url": {
+          "type": "string",
+          "default": "https://subdomain.atlassian.net",
+          "description": "Base URL for your jira site - Required"
+        },
+        "jiraSearch.username": {
+          "type": "string",
+          "default": "",
+          "description": "Username for your jira account (typically not the email address) - Required"
+        },
+        "jiraSearch.password": {
+          "type": "string",
+          "default": "",
+          "description": "Password for your jira account - Required"
+        },
+        "jiraSearch.labelFormat": {
+          "type": "string",
+          "default": "{fields.status.name} - [{fields.issuetype.name}][{fields.priority.name}] {key}",
+          "description": "The first part of an issue listing"
+        },
+        "jiraSearch.descriptionFormat": {
+          "type": "string",
+          "default": "{fields.summary}",
+          "description": "Second part. Smaller text next to the label. Issue summary by default."
+        },
+        "jiraSearch.detailFormat": {
+          "type": "string",
+          "default": "{fields.description}",
+          "description": "Appears below the label and description. Default is the issue description."
+        },
+        "jiraSearch.clipboardFormat": {
+          "type": "string",
+          "default": "{key} - {fields.summary} - {fields.description}",
+          "description": "Format of data copied to clipboard"
+        },
+        "jiraSearch.jql": {
+          "type": "string",
+          "default": "assignee={username} and status!=Done order by created",
+          "description": "JQL used to fetch issues. Only the {username} token is currently supported."
+        },
+        "jiraSearch.updateInterval": {
+          "type": "number",
+          "default": 5,
+          "description": "How often to update local issue cache (in minutes)"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
