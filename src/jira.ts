@@ -12,9 +12,8 @@ let jiraConfig = getConfiguration();
 let jiraIssues = [];
 
 /**
- * jiraIssues as well as any other issues mapped to an object by key for easy access.
+ * jiraIssues as well as any other issues mapped to an object by formatted label for easy access throughout menus.
  * @type {object}
- * @example jiraIssueMap['ISSUE-101']
  */
 let jiraIssueMap = {};
 
@@ -74,6 +73,16 @@ function parseTokens(obj: any, format: string): string {
   }
   return format;
 }
+
+/**
+ * Calls parseTokens for the passed issue object.
+ * The format is defaulted to the configuration value
+ * @param {*} issue 
+ */
+function parseIssueLabelTokens(issue: any) {
+  return parseTokens(issue, jiraConfig.labelFormat);
+}
+
 function tokenToValue(obj: any, namespace: string): string {
   let names = namespace.replace(/[{}]*/g, '').split('.');
   for (let i = 0; i < names.length; i++) {
@@ -91,7 +100,7 @@ function updateIssues(response: any): void {
   //need a good way to map quickpicks to issues.
   jiraIssueMap = {};
   jiraIssues.forEach(issue => {
-    let id = parseTokens(issue, jiraConfig.labelFormat);
+    let id = parseIssueLabelTokens(issue);
     jiraIssueMap[id] = issue;
   });
 
@@ -103,7 +112,7 @@ function issueToMessage(issue): string {
 }
 function issueToQuickPick(issue): QuickPickItem {
   let quickPickItem: QuickPickItem = {
-    label: parseTokens(issue, jiraConfig.labelFormat),
+    label: parseIssueLabelTokens(issue),
     description: parseTokens(issue, jiraConfig.descriptionFormat),
     detail: parseTokens(issue, jiraConfig.detailFormat)
   };
@@ -127,22 +136,22 @@ function commentToQuickPick(comment): QuickPickItem {
 function showComments(issue): void {
   jiraApi.getComments(issue.key).then(response => {
     let comments = response['comments'];
-    let label = parseTokens(issue, jiraConfig.labelFormat);
+    let label = parseIssueLabelTokens(issue);
     if (comments.length == 0) {
       window.showInformationMessage(`No comments found for issue ${label}`, 'Go back').then((selection: string) => {
         if (selection !== undefined) {
-          showSelectionOptions({ label: issue.key });
+          showSelectionOptions({ label: parseIssueLabelTokens(issue) });
         }
       });
     } else {
       window.showQuickPick(comments.map(commentToQuickPick)).then(row => {
-        showSelectionOptions({ label: issue.key });
+        showSelectionOptions({ label: parseIssueLabelTokens(issue) });
       });
     }
   });
 }
 function addComment(issue): void {
-  let label = parseTokens(issue, jiraConfig.labelFormat);
+  let label = parseIssueLabelTokens(issue);
   let inputBoxOptions: InputBoxOptions = {
     ignoreFocusOut: true,
     prompt: `Add Comment To ${label}`
@@ -154,7 +163,7 @@ function addComment(issue): void {
   });
 }
 function showTransitionOptions(issue): void {
-  let label = parseTokens(issue, jiraConfig.labelFormat);
+  let label = parseIssueLabelTokens(issue);
   let currentTransition = issue.fields.status.name;
   jiraApi.getTransitions(issue.key).then(response => {
     let transitions = response['transitions'];
@@ -247,8 +256,9 @@ export function showIssueKeySearch() {
         } else if (response.errorMessages && response.errorMessages.length > 0) {
           throw Error(response.errorMessages[0]);
         }
-        jiraIssueMap[response.key] = response;
-        showSelectionOptions({ label: response.key });
+        let issueLabel = parseIssueLabelTokens(response);
+        jiraIssueMap[issueLabel] = response;
+        showSelectionOptions({ label: issueLabel });
       })
       .catch(err => {
         window.showErrorMessage(err.message);
