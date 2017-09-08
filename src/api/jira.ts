@@ -113,7 +113,8 @@ export function getIssue(issueKey: string) {
 
 export function getPossibleAssigneesForIssue(issueKey: string) {
   return new Promise((resolve, reject) => {
-    _invoke(`/api/latest/user/permission/search?permissions=ASSIGNABLE_USER&issueKey=${issueKey}`, 'GET')
+    // TODO: Pagination
+    _invoke(`/api/latest/user/assignable/search?issueKey=${issueKey}&active=true&maxResults=1000`, 'GET')
       .then(response => {
         resolve(response);
       })

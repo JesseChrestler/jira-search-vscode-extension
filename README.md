@@ -8,7 +8,7 @@ Possibly in the future I will add other search/queries you can perform.
 This is currently not published in the visual studio code market.
 Simply run the following command:
 
-`code --install-extension jira-search-0.1.0.vsix`
+`code --install-extension jira-search-0.3.0.vsix`
 
 ## Usage
 
