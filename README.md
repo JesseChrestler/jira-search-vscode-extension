@@ -3,13 +3,6 @@
 This is a simple extension that allows you to search your JIRA issues assigned to you.
 Possibly in the future I will add other search/queries you can perform. 
 
-## Installation
-
-This is currently not published in the visual studio code market.
-Simply run the following command:
-
-`code --install-extension jira-search-0.3.0.vsix`
-
 ## Usage
 
 Type "Jira Search My Issues"
