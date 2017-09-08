@@ -213,10 +213,55 @@ function showReassignOptions(issue: any): void {
       jiraApi
         .setAssigneeForIssue(issue.key, assigneeKey)
         .then(() => {
-          window.setStatusBarMessage(`Reassigned ${issue.key} to ${selectedAssignee}`);
+          window.setStatusBarMessage(`Reassigned ${issue.key} to ${selectedAssignee}`, 5000);
         })
         .catch(err => {
-          window.setStatusBarMessage(`Could not reassign ${issue.key} to ${selectedAssignee}`);
+          window.setStatusBarMessage(`Could not reassign ${issue.key} to ${selectedAssignee}`, 10000);
+        });
+    });
+  });
+}
+
+function showWorklogs(issue: any): void {
+  jiraApi.getWorklogsForIssue(issue.key).then((response: any) => {
+    if (response.total === 0) {
+      window.setStatusBarMessage(`No worklogs found for ${issue.key}`, 5000);
+      showSelectionOptions({ label: parseIssueLabelTokens(issue) });
+      return;
+    }
+
+    let worklogs = response.worklogs.map(worklog => {
+      return {
+        label: `${worklog.author.displayName}`,
+        description: `${worklog.timeSpent} - ${new Date(worklog.started).toLocaleString()}`,
+        detail: worklog.detail
+      };
+    });
+    window.showQuickPick(worklogs, { placeHolder: 'Press enter to return' }).then(() => {
+      showSelectionOptions({ label: parseIssueLabelTokens(issue) });
+    });
+  });
+}
+
+function addWorklog(issue: any): void {
+  const returnToMenu = () => {
+    showSelectionOptions({ label: parseIssueLabelTokens(issue) });
+  };
+
+  window.showInputBox({ prompt: 'Enter time spent in minutes' }).then(timeSpentInput => {
+    let timeSpentMinutes = parseInt(timeSpentInput, 10);
+    if (timeSpentMinutes === 'NaN') {
+      returnToMenu();
+    }
+    let timeSpentSeconds = timeSpentMinutes * 60;
+    window.showInputBox({ prompt: 'Enter a comment' }).then((comment: string) => {
+      jiraApi
+        .addWorklogToIssue(issue.key, comment, timeSpentSeconds)
+        .then(() => {
+          window.setStatusBarMessage(`Worklog added  to ${issue.key}`, 5000);
+        })
+        .catch(err => {
+          window.setStatusBarMessage(`Worklog could not be added to ${issue.key}`, 5000);
         });
     });
   });
@@ -233,8 +278,17 @@ function showSelectionOptions(quickPickItem: any): void {
     title: 'Cancel'
   };
 
+  let selectOptions: string[] = [
+    'Copy to Clipboard',
+    'Add Comment',
+    'View Comments',
+    'Reassign',
+    'Transition',
+    'Add Worklog',
+    'View Worklogs'
+  ];
   window
-    .showQuickPick(['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition'], {
+    .showQuickPick(selectOptions, {
       placeHolder: `Perform Which Action on ${quickPickItem.label}?`
     })
     .then((selection: string) => {
@@ -253,6 +307,12 @@ function showSelectionOptions(quickPickItem: any): void {
           break;
         case 'Reassign':
           showReassignOptions(selectedIssue);
+          break;
+        case 'Add Worklog':
+          addWorklog(selectedIssue);
+          break;
+        case 'Show Worklogs':
+          showWorklogs(selectedIssue);
           break;
         default:
           break;

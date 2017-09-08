@@ -133,6 +133,33 @@ export function setAssigneeForIssue(issueKey: string, username: string) {
   });
 }
 
+export function getWorklogsForIssue(issueKey: string) {
+  return new Promise((resolve, reject) => {
+    _invoke(`/api/latest/issue/${issueKey}/worklog`, 'GET')
+      .then((response: any) => {
+        resolve(response);
+      })
+      .catch((err: any) => {
+        resolve(err);
+      });
+  });
+}
+
+export function addWorklogToIssue(issueKey: string, comment: string, timeSpentSeconds: number) {
+  return new Promise((resolve, reject) => {
+    _invoke(`/api/latest/issue/${issueKey}/worklog`, 'POST', {
+      comment: comment,
+      timeSpentSeconds: timeSpentSeconds
+    })
+      .then((response: any) => {
+        resolve(response);
+      })
+      .catch((err: any) => {
+        resolve(err);
+      });
+  });
+}
+
 export function setConfig(baseUrl: string, username: string, password: string) {
   _config.baseUrl = baseUrl;
   _config.username = username;
