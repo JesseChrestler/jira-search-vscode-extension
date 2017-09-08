@@ -252,8 +252,8 @@ function addWorklog(issue: any): void {
   };
 
   window.showInputBox({ prompt: 'Enter time spent in minutes' }).then(timeSpentInput => {
-    let timeSpentMinutes = parseInt(timeSpentInput, 10);
-    if (timeSpentMinutes === 'NaN') {
+    let timeSpentMinutes: number = parseInt(timeSpentInput, 10);
+    if (Number.isNaN(timeSpentMinutes)) {
       returnToMenu();
     }
     let timeSpentSeconds = timeSpentMinutes * 60;
