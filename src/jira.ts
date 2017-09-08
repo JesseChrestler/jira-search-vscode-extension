@@ -175,7 +175,8 @@ function showTransitionOptions(issue): void {
             name = '[current] ' + name;
           }
           return name;
-        })
+        }),
+        { placeHolder: `Transition ${issue.key} from ${currentTransition} to...` }
       )
       .then(transitionName => {
         if (transitionName !== currentTransition) {
@@ -204,7 +205,10 @@ function showReassignOptions(issue: any): void {
       assigneeList.push(assignee.displayName);
     }
 
-    window.showQuickPick(assigneeList).then(selectedAssignee => {
+    let currentAssignee: string = issue.fields.assignee === null ? 'Unassigned' : issue.fields.assignee.displayName;
+    let label: string = `Change assignee from ${currentAssignee} to...`;
+
+    window.showQuickPick(assigneeList, { placeHolder: label }).then(selectedAssignee => {
       let assigneeKey = assignees[selectedAssignee].key;
       jiraApi
         .setAssigneeForIssue(issue.key, assigneeKey)
@@ -228,19 +232,14 @@ function showSelectionOptions(quickPickItem: any): void {
     isCloseAffordance: true,
     title: 'Cancel'
   };
+
   window
-    .showInformationMessage(
-      `Perform Which Action on ${quickPickItem.label}?`,
-      cancelButton,
-      { title: 'Copy' },
-      { title: 'Add Comment' },
-      { title: 'View Comments' },
-      { title: 'Reassign' },
-      { title: 'Transition' }
-    )
-    .then(result => {
-      switch (result.title) {
-        case 'Copy':
+    .showQuickPick(['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition'], {
+      placeHolder: `Perform Which Action on ${quickPickItem.label}?`
+    })
+    .then((selection: string) => {
+      switch (selection) {
+        case 'Copy to Clipboard':
           copyIssueToClipboard(selectedIssue);
           break;
         case 'View Comments':
@@ -264,7 +263,9 @@ export function showIssues() {
   if (jiraQuickPicks.length === 0) {
     jiraUpdate().then(showIssues);
   } else {
-    window.showQuickPick(jiraQuickPicks, jiraQuickPickOptions).then(showSelectionOptions);
+    window
+      .showQuickPick(jiraQuickPicks, Object.assign(jiraQuickPickOptions, { placeHolder: 'Select an issue' }))
+      .then(showSelectionOptions);
   }
 }
 
