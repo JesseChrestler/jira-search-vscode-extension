@@ -96,6 +96,21 @@ Issues will not get pulled everytime you run the command, they will only get pul
 
 ## Release Notes
 
+### 0.3.0
+
+* Added experimental worklog support (add and view worklogs!)
+* Changed the task menu to a quickpick so you no longer need a mouse
+* Change the assignee of an issue
+* Added placeholders to quickpick menus to make things a little more user-friendly
+* Added missing timeouts to status bar updates
+* Return to menu after transitioning issues, viewing comments, etc.
+
+### 0.2.0 
+
+* Automatically register configuration options
+* New command to look up an issue by key ("Jira View Issue")
+* Return to the menu after closing the comment list 
+* Option to return to the menu if no comments are found
 
 ### 0.1.0
 
