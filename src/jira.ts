@@ -158,6 +158,7 @@ function addComment(issue): void {
   };
   window.showInputBox(inputBoxOptions).then(comment => {
     jiraApi.addComment(issue.key, comment).then(() => {
+      showSelectionOptions({ label: parseIssueLabelTokens(issue) });
       window.setStatusBarMessage(`Successfully added comment to JIRA ${label}`);
     });
   });
@@ -183,11 +184,13 @@ function showTransitionOptions(issue): void {
           var newTransition = transitions.filter(transition => transition.name == transitionName)[0];
           jiraApi.setTransition(issue.key, newTransition.id).then(() => {
             jiraUpdate().then(() => {
-              window.setStatusBarMessage(`Successfully transitioned JIRA ${label} to [${transitionName}]`);
+              window.setStatusBarMessage(`Successfully transitioned JIRA ${label} to [${transitionName}]`, 5000);
+              showSelectionOptions({ label: parseIssueLabelTokens(issue) });
             });
           });
         } else {
-          window.setStatusBarMessage(`JIRA ${label} is already in status [${transitionName}]`);
+          window.setStatusBarMessage(`JIRA ${label} is already in status [${transitionName}]`, 5000);
+          showSelectionOptions({ label: parseIssueLabelTokens(issue) });
         }
       });
   });
@@ -213,10 +216,12 @@ function showReassignOptions(issue: any): void {
       jiraApi
         .setAssigneeForIssue(issue.key, assigneeKey)
         .then(() => {
-          window.setStatusBarMessage(`Reassigned ${issue.key} to ${selectedAssignee}`);
+          window.setStatusBarMessage(`Reassigned ${issue.key} to ${selectedAssignee}`, 5000);
+          showSelectionOptions({ label: parseIssueLabelTokens(issue) });
         })
         .catch(err => {
-          window.setStatusBarMessage(`Could not reassign ${issue.key} to ${selectedAssignee}`);
+          window.setStatusBarMessage(`Could not reassign ${issue.key} to ${selectedAssignee}`, 5000);
+          showSelectionOptions({ label: parseIssueLabelTokens(issue) });
         });
     });
   });
