@@ -191,6 +191,33 @@ function showTransitionOptions(issue): void {
       });
   });
 }
+
+function showReassignOptions(issue: any): void {
+  let label = parseIssueLabelTokens(issue);
+
+  jiraApi.getPossibleAssigneesForIssue(issue.key).then((response: Array<any>) => {
+    let assignees = {};
+    let assigneeList = [];
+
+    for (let assignee of response) {
+      assignees[assignee.displayName] = assignee;
+      assigneeList.push(assignee.displayName);
+    }
+
+    window.showQuickPick(assigneeList).then(selectedAssignee => {
+      let assigneeKey = assignees[selectedAssignee].key;
+      jiraApi
+        .setAssigneeForIssue(issue.key, assigneeKey)
+        .then(() => {
+          window.setStatusBarMessage(`Reassigned ${issue.key} to ${selectedAssignee}`);
+        })
+        .catch(err => {
+          window.setStatusBarMessage(`Could not reassign ${issue.key} to ${selectedAssignee}`);
+        });
+    });
+  });
+}
+
 /**
  * 
  * @param {*} quickPickItem Contains "label" which should be the issue key
@@ -208,6 +235,7 @@ function showSelectionOptions(quickPickItem: any): void {
       { title: 'Copy' },
       { title: 'Add Comment' },
       { title: 'View Comments' },
+      { title: 'Reassign' },
       { title: 'Transition' }
     )
     .then(result => {
@@ -221,9 +249,12 @@ function showSelectionOptions(quickPickItem: any): void {
         case 'Add Comment':
           addComment(selectedIssue);
           break;
-        case 'Transition': {
+        case 'Transition':
           showTransitionOptions(selectedIssue);
-        }
+          break;
+        case 'Reassign':
+          showReassignOptions(selectedIssue);
+          break;
         default:
           break;
       }

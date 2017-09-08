@@ -110,6 +110,29 @@ export function getIssue(issueKey: string) {
       .catch(response => reject(response));
   });
 }
+
+export function getPossibleAssigneesForIssue(issueKey: string) {
+  return new Promise((resolve, reject) => {
+    _invoke(`/api/latest/user/permission/search?permissions=ASSIGNABLE_USER&issueKey=${issueKey}`, 'GET')
+      .then(response => {
+        resolve(response);
+      })
+      .catch(err => reject(err));
+  });
+}
+
+export function setAssigneeForIssue(issueKey: string, username: string) {
+  return new Promise((resolve, reject) => {
+    _invoke(`/api/latest/issue/${issueKey}/assignee`, 'PUT', { name: username })
+      .then(response => {
+        resolve(response);
+      })
+      .catch(err => {
+        resolve(err);
+      });
+  });
+}
+
 export function setConfig(baseUrl: string, username: string, password: string) {
   _config.baseUrl = baseUrl;
   _config.username = username;
