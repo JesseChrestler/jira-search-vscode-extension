@@ -84,6 +84,17 @@ Issues will not get pulled everytime you run the command, they will only get pul
 
 ## Release Notes
 
+### RoadMap
+
+Working on using tree provider to show JIRA issues.
+
+### 0.2.0
+
+* Read Me Updated
+* Added configuration to package.json so that it will generate default configuration
+* Added ability to lookup by issue key.
+ 
+ - Thanks Andrew Natoli
 
 ### 0.1.0
 
