@@ -282,15 +282,12 @@ function showSelectionOptions(quickPickItem: any): void {
     title: 'Cancel'
   };
 
-  let selectOptions: string[] = [
-    'Copy to Clipboard',
-    'Add Comment',
-    'View Comments',
-    'Reassign',
-    'Transition',
-    'Add Worklog',
-    'View Worklogs'
-  ];
+  let selectOptions: string[] = ['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition'];
+
+  if (jiraConfig.enableWorklogs === true) {
+    selectOptions.push('Add Worklog', 'View Worklogs');
+  }
+
   window
     .showQuickPick(selectOptions, {
       placeHolder: `Perform Which Action on ${quickPickItem.label}?`
@@ -315,7 +312,7 @@ function showSelectionOptions(quickPickItem: any): void {
         case 'Add Worklog':
           addWorklog(selectedIssue);
           break;
-        case 'Show Worklogs':
+        case 'View Worklogs':
           showWorklogs(selectedIssue);
           break;
         default:

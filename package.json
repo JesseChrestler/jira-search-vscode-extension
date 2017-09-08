@@ -80,6 +80,11 @@
           "type": "number",
           "default": 5,
           "description": "How often to update local issue cache (in minutes)"
+        },
+        "jiraSearch.enableWorklogs": {
+          "type": "boolean",
+          "default": false,
+          "description": "Experimental: View and add worklogs. Does not work with third party plugins such as Tempo."
         }
       }
     }
