@@ -78,12 +78,39 @@ For example, the provided `labelFormat` will appear like this:
 "jiraSearch.updateInterval" : 5
 ```
 
+#### Enable Worklogs
+
+Worklog support is an experimental feature that could use a tester. It is disabled by default.
+
+When enabled (set this option to `true`) you can view and add worklogs to an issue.
+
+This feature does _not_ work properly with third party time tracking plugins such as Tempo.
+
+```
+"jiraSearch.enableWorklogs: false
+```
+
 ## Known Issues
 
 Issues will not get pulled everytime you run the command, they will only get pulled when you run the command the first time and then they will be pulled every X interval (default 5 minutes) which is customizable.
 
 ## Release Notes
 
+### 0.3.0
+
+* Added experimental worklog support (add and view worklogs!)
+* Changed the task menu to a quickpick so you no longer need a mouse
+* Change the assignee of an issue
+* Added placeholders to quickpick menus to make things a little more user-friendly
+* Added missing timeouts to status bar updates
+* Return to menu after transitioning issues, viewing comments, etc.
+
+### 0.2.0 
+
+* Automatically register configuration options
+* New command to look up an issue by key ("Jira View Issue")
+* Return to the menu after closing the comment list 
+* Option to return to the menu if no comments are found
 
 ### 0.1.0
 

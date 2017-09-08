@@ -158,6 +158,7 @@ function addComment(issue): void {
   };
   window.showInputBox(inputBoxOptions).then(comment => {
     jiraApi.addComment(issue.key, comment).then(() => {
+      showSelectionOptions({ label: parseIssueLabelTokens(issue) });
       window.setStatusBarMessage(`Successfully added comment to JIRA ${label}`);
     });
   });
@@ -175,22 +176,101 @@ function showTransitionOptions(issue): void {
             name = '[current] ' + name;
           }
           return name;
-        })
+        }),
+        { placeHolder: `Transition ${issue.key} from ${currentTransition} to...` }
       )
       .then(transitionName => {
         if (transitionName !== currentTransition) {
           var newTransition = transitions.filter(transition => transition.name == transitionName)[0];
           jiraApi.setTransition(issue.key, newTransition.id).then(() => {
             jiraUpdate().then(() => {
-              window.setStatusBarMessage(`Successfully transitioned JIRA ${label} to [${transitionName}]`);
+              window.setStatusBarMessage(`Successfully transitioned JIRA ${label} to [${transitionName}]`, 5000);
+              showSelectionOptions({ label: parseIssueLabelTokens(issue) });
             });
           });
         } else {
-          window.setStatusBarMessage(`JIRA ${label} is already in status [${transitionName}]`);
+          window.setStatusBarMessage(`JIRA ${label} is already in status [${transitionName}]`, 5000);
+          showSelectionOptions({ label: parseIssueLabelTokens(issue) });
         }
       });
   });
 }
+
+function showReassignOptions(issue: any): void {
+  let label = parseIssueLabelTokens(issue);
+
+  jiraApi.getPossibleAssigneesForIssue(issue.key).then((response: Array<any>) => {
+    let assignees = {};
+    let assigneeList = [];
+
+    for (let assignee of response) {
+      assignees[assignee.displayName] = assignee;
+      assigneeList.push(assignee.displayName);
+    }
+
+    let currentAssignee: string = issue.fields.assignee === null ? 'Unassigned' : issue.fields.assignee.displayName;
+    let label: string = `Change assignee from ${currentAssignee} to...`;
+
+    window.showQuickPick(assigneeList, { placeHolder: label }).then(selectedAssignee => {
+      let assigneeKey = assignees[selectedAssignee].key;
+      jiraApi
+        .setAssigneeForIssue(issue.key, assigneeKey)
+        .then(() => {
+          window.setStatusBarMessage(`Reassigned ${issue.key} to ${selectedAssignee}`, 5000);
+        })
+        .catch(err => {
+          window.setStatusBarMessage(`Could not reassign ${issue.key} to ${selectedAssignee}`, 10000);
+        });
+    });
+  });
+}
+
+function showWorklogs(issue: any): void {
+  jiraApi.getWorklogsForIssue(issue.key).then((response: any) => {
+    if (response.total === 0) {
+      window.setStatusBarMessage(`No worklogs found for ${issue.key}`, 5000);
+      showSelectionOptions({ label: parseIssueLabelTokens(issue) });
+      return;
+    }
+
+    let worklogs = response.worklogs.map(worklog => {
+      return {
+        label: `${worklog.author.displayName}`,
+        description: `${worklog.timeSpent} - ${new Date(worklog.started).toLocaleString()}`,
+        detail: worklog.detail
+      };
+    });
+    window.showQuickPick(worklogs, { placeHolder: 'Press enter to return' }).then(() => {
+      showSelectionOptions({ label: parseIssueLabelTokens(issue) });
+    });
+  });
+}
+
+function addWorklog(issue: any): void {
+  const returnToMenu = () => {
+    showSelectionOptions({ label: parseIssueLabelTokens(issue) });
+  };
+
+  window.showInputBox({ prompt: 'Enter time spent in minutes' }).then(timeSpentInput => {
+    let timeSpentMinutes = parseInt(timeSpentInput, 10);
+    if (timeSpentMinutes === 'NaN') {
+      returnToMenu();
+    }
+    let timeSpentSeconds = timeSpentMinutes * 60;
+    window.showInputBox({ prompt: 'Enter a comment' }).then((comment: string) => {
+      jiraApi
+        .addWorklogToIssue(issue.key, comment, timeSpentSeconds)
+        .then(() => {
+          window.setStatusBarMessage(`Worklog added  to ${issue.key}`, 5000);
+        })
+        .catch(err => {
+          window.setStatusBarMessage(`Worklog could not be added to ${issue.key}`, 5000);
+          showSelectionOptions({ label: parseIssueLabelTokens(issue) });
+        });
+    });
+  });
+}
+
 /**
  * 
  * @param {*} quickPickItem Contains "label" which should be the issue key
@@ -201,18 +281,20 @@ function showSelectionOptions(quickPickItem: any): void {
     isCloseAffordance: true,
     title: 'Cancel'
   };
+
+  let selectOptions: string[] = ['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition'];
+
+  if (jiraConfig.enableWorklogs === true) {
+    selectOptions.push('Add Worklog', 'View Worklogs');
+  }
+
   window
-    .showInformationMessage(
-      `Perform Which Action on ${quickPickItem.label}?`,
-      cancelButton,
-      { title: 'Copy' },
-      { title: 'Add Comment' },
-      { title: 'View Comments' },
-      { title: 'Transition' }
-    )
-    .then(result => {
-      switch (result.title) {
-        case 'Copy':
+    .showQuickPick(selectOptions, {
+      placeHolder: `Perform Which Action on ${quickPickItem.label}?`
+    })
+    .then((selection: string) => {
+      switch (selection) {
+        case 'Copy to Clipboard':
           copyIssueToClipboard(selectedIssue);
           break;
         case 'View Comments':
@@ -221,9 +303,18 @@ function showSelectionOptions(quickPickItem: any): void {
         case 'Add Comment':
           addComment(selectedIssue);
           break;
-        case 'Transition': {
+        case 'Transition':
           showTransitionOptions(selectedIssue);
-        }
+          break;
+        case 'Reassign':
+          showReassignOptions(selectedIssue);
+          break;
+        case 'Add Worklog':
+          addWorklog(selectedIssue);
+          break;
+        case 'View Worklogs':
+          showWorklogs(selectedIssue);
+          break;
         default:
           break;
       }
@@ -233,7 +324,9 @@ export function showIssues() {
   if (jiraQuickPicks.length === 0) {
     jiraUpdate().then(showIssues);
   } else {
-    window.showQuickPick(jiraQuickPicks, jiraQuickPickOptions).then(showSelectionOptions);
+    window
+      .showQuickPick(jiraQuickPicks, Object.assign(jiraQuickPickOptions, { placeHolder: 'Select an issue' }))
+      .then(showSelectionOptions);
   }
 }
 
