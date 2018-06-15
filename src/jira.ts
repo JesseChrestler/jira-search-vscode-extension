@@ -286,7 +286,7 @@ function showSelectionOptions(quickPickItem: any): void {
     title: 'Cancel'
   };
 
-  let selectOptions: string[] = ['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition'];
+  let selectOptions: string[] = ['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition', 'Open in Browser'];
 
   if (jiraConfig.enableWorklogs === true) {
     selectOptions.push('Add Worklog', 'View Worklogs');
