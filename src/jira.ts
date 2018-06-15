@@ -1,7 +1,7 @@
-import { workspace, window, QuickPickItem, QuickPickOptions, MessageItem, InputBoxOptions } from 'vscode';
+import * as copypaste from 'copy-paste';
+import { commands, InputBoxOptions, MessageItem, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
 import * as jiraApi from './api/jira';
 import getConfiguration from './config';
-import * as copypaste from 'copy-paste';
 
 let jiraConfig = getConfiguration();
 
@@ -271,6 +271,10 @@ function addWorklog(issue: any): void {
   });
 }
 
+function openInBrowser(issue: any) {
+  commands.executeCommand('vscode.open', Uri.parse(jiraConfig.url + '/browse/' + issue.key));
+}
+
 /**
  * 
  * @param {*} quickPickItem Contains "label" which should be the issue key
@@ -282,7 +286,7 @@ function showSelectionOptions(quickPickItem: any): void {
     title: 'Cancel'
   };
 
-  let selectOptions: string[] = ['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition'];
+  let selectOptions: string[] = ['Copy to Clipboard', 'Add Comment', 'View Comments', 'Reassign', 'Transition', 'Open in Browser'];
 
   if (jiraConfig.enableWorklogs === true) {
     selectOptions.push('Add Worklog', 'View Worklogs');
@@ -314,6 +318,9 @@ function showSelectionOptions(quickPickItem: any): void {
           break;
         case 'View Worklogs':
           showWorklogs(selectedIssue);
+          break;
+        case 'Open in Browser':
+          openInBrowser(selectedIssue);
           break;
         default:
           break;
